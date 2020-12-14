@@ -7,13 +7,33 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+extension UIViewController {
+    class func swizzleMethod() {
+        let originalSelector = #selector(viewWillAppear)
+        let swizzleSelector = #selector(swizzleViewWillAppear)
 
+        guard
+            let originMethod = class_getInstanceMethod(UIViewController.self, originalSelector),
+            let swizzleMethod = class_getInstanceMethod(UIViewController.self, swizzleSelector)
+        else { return }
+        
+        method_exchangeImplementations(originMethod, swizzleMethod)
+    }
+    
+    @objc public func swizzleViewWillAppear(animated: Bool) {
+        print("🌞 swizzleViewWillAppear")
+    }
+}
+
+class ViewController: UIViewController {
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
     }
-
-
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        print("🌑 override viewWillAppear")
+    }
 }
 
